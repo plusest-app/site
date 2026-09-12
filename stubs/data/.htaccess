@@ -1,0 +1,17 @@
+# Захист службового каталогу на випадок, якщо він виявиться доступним з вебу
+# (наприклад, коли сайт працює на Apache і каталог опинився під document root).
+#
+# У nginx директиви .htaccess не працюють — там каталог data просто не повинен
+# входити в location, що віддає файли. Приклад конфігурації nginx наведений
+# у кінці файлу config.php.
+
+# Apache 2.4
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

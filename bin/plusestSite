@@ -1,0 +1,50 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Точка входу для команд заготовки Plusest Site.
+ *
+ * Запуск:
+ *     php vendor/bin/plusestSite install
+ *     php vendor/bin/plusestSite migrate --config=plusestSite/config.php
+ *     php vendor/bin/plusestSite check   --config=plusestSite/config.php
+ */
+
+// Скрипт має сенс лише в командному рядку — через браузер його не запускають.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit('Цей скрипт запускається лише з командного рядка.');
+}
+
+// Шукаємо автозавантажувач Composer. Перший шлях — коли пакет встановлений
+// як залежність (vendor/plusest/site/bin/), другий — коли працюємо всередині
+// самого репозиторію пакета.
+$autoloadCandidates = [
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+];
+
+$autoloadFound = false;
+
+foreach ($autoloadCandidates as $autoload) {
+    if (is_file($autoload)) {
+        require $autoload;
+        $autoloadFound = true;
+
+        break;
+    }
+}
+
+if (!$autoloadFound) {
+    fwrite(
+        STDERR,
+        'Не знайдено автозавантажувач Composer.' . PHP_EOL
+        . 'Виконайте "composer install" у каталозі проєкту.' . PHP_EOL
+    );
+
+    exit(1);
+}
+
+$cli = new Plusest\Site\Console\Cli();
+
+exit($cli->run($argv));

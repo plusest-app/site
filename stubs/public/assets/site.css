@@ -1,0 +1,2003 @@
+/* ===========================================================================
+ *  Оформлення розділу нерухомості
+ * ===========================================================================
+ *
+ *  Це повністю самостійні стилі: жодного Bootstrap чи іншого фреймворка
+ *  розділ не потребує. Підключаються з CDN лише вузькі бібліотеки —
+ *  випадні списки (Select2), карусель (Owl Carousel), галерея (Fancybox),
+ *  розкладка характеристик (Masonry) та шрифт іконок (Flaticon UIcons).
+ *
+ *  Усі класи починаються з «pl-» (plusest), тому зі стилями вашого сайту
+ *  вони не сплутаються. Службові класи бібліотек (owl-*, select2-*, fancybox-*)
+ *  перевизначаються в кінці файлу — там, де це потрібно.
+ *
+ *  Як підігнати розділ під свій сайт
+ *  ---------------------------------
+ *  Майже все оформлення зібране у змінних у блоці :root нижче. Замініть у
+ *  ньому колір --pl-accent на колір свого сайту й шрифт --pl-font — і
+ *  розділ одразу стане частиною вашого дизайну. Правити решту файлу
+ *  зазвичай не потрібно.
+ *
+ *  Зміст
+ *  -----
+ *   1. Змінні
+ *   2. База й типографіка
+ *   3. Сітка та контейнер
+ *   4. Кнопки й посилання
+ *   5. Навігація розділу, перемикачі
+ *   6. Фільтр
+ *   7. Картка обʼєкта
+ *   8. Список обʼєктів, сортування, пагінація
+ *   9. Сторінка публікації
+ *  10. Картка агента
+ *  11. Обране
+ *  12. Повідомлення й порожні стани
+ *  13. Перевизначення бібліотек
+ *  14. Адаптив
+ * =========================================================================== */
+
+
+/* ===========================================================================
+ *  1. Змінні
+ * =========================================================================== */
+
+.plusest {
+    /* --- Кольори ---------------------------------------------------------- */
+
+    /* Основний колір розділу: кнопки, позначка NEW, активні пункти. Саме
+       його варто замінити на колір свого сайту першим. */
+    --pl-accent: #2f43a9;
+    --pl-accent-dark: #25358a;
+    --pl-accent-soft: #eef0fb;
+
+    /* Колір сердечка «в обране», коли обʼєкт уже відкладений. */
+    --pl-like: #ef4d72;
+
+    --pl-text: #232733;
+    --pl-muted: #7a8090;
+    --pl-line: #e7e9f0;
+    --pl-soft: #f4f5f8;
+    --pl-white: #fff;
+
+    /* --- Типографіка ------------------------------------------------------ */
+
+    /* Основний шрифт розділу. Exo 2 підключається в layout.php; якщо ви
+       його прибрали — тут залишиться системний шрифт вашого сайту. */
+    --pl-font: 'Exo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* Шрифт цін. Вузький технічний шрифт із рівними цифрами: у стовпчику
+       карточок ціни різної довжини не «стрибають». */
+    --pl-font-price: 'Electrolize', var(--pl-font);
+
+    /* --- Форми ------------------------------------------------------------ */
+
+    --pl-radius: 10px;
+    --pl-radius-sm: 6px;
+    --pl-shadow: 0 2px 14px rgba(35, 39, 51, .07);
+    --pl-shadow-lg: 0 12px 40px rgba(35, 39, 51, .16);
+
+    /* Тривалість усіх переходів. Плавність зібрана в одному місці, тому
+       «прибрати анімації» — це поставити тут 0s. */
+    --pl-fast: .18s;
+    --pl-slow: .35s;
+}
+
+
+/* ===========================================================================
+ *  2. База й типографіка
+ * ===========================================================================
+ *
+ *  Усе задається всередині .plusest, а не для body: розділ вбудовується у
+ *  ваш сайт, і його стилі не мусять діяти на решту сторінок.
+ */
+
+.plusest {
+    box-sizing: border-box;
+    color: var(--pl-text);
+    font-family: var(--pl-font);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.plusest *,
+.plusest *::before,
+.plusest *::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.plusest h1,
+.plusest h2,
+.plusest h3 {
+    margin: 0 0 .75rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.plusest h1 {
+    font-size: 1.9rem;
+}
+
+.plusest h2 {
+    font-size: 1.35rem;
+}
+
+.plusest h3 {
+    font-size: 1.05rem;
+}
+
+.plusest p {
+    margin: 0 0 .75rem;
+}
+
+.plusest a {
+    color: var(--pl-accent);
+    text-decoration: none;
+    transition: color var(--pl-fast) ease;
+}
+
+.plusest a:hover {
+    color: var(--pl-accent-dark);
+}
+
+.plusest img {
+    max-width: 100%;
+}
+
+/* Іконки Flaticon стоять усередині рядків тексту, тому вирівнюємо їх по
+   базовій лінії та трохи піднімаємо — інакше вони «провисають». */
+.plusest .fi {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    line-height: 1;
+}
+
+.pl-muted {
+    color: var(--pl-muted);
+}
+
+/* Текст лише для програм читання з екрана: візуально прихований, але
+   доступний. Так підписані стрілки каруселі — самої іконки для незрячого
+   відвідувача недостатньо. */
+.pl-sr {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.pl-small {
+    font-size: .875rem;
+}
+
+/* Ціна. Окремий клас, бо ціна зустрічається і в картці, і на сторінці, і в
+   блоці схожих обʼєктів — а шрифт та міжлітерний інтервал у неї свої. */
+.pl-price {
+    font-family: var(--pl-font-price);
+    font-weight: 400;
+    letter-spacing: .01em;
+    white-space: nowrap;
+}
+
+
+/* ===========================================================================
+ *  3. Сітка та контейнер
+ * =========================================================================== */
+
+.pl-container {
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Обгортка сторінки. Відступ знизу — щоб підвал вашого сайту не прилипав
+   до останнього блоку розділу. */
+.plusest-main {
+    padding-bottom: 3rem;
+}
+
+.pl-section {
+    margin-top: 2.5rem;
+}
+
+.pl-section-title {
+    margin-bottom: 1.25rem;
+    font-size: 1.35rem;
+}
+
+
+/* ===========================================================================
+ *  4. Кнопки й посилання
+ * =========================================================================== */
+
+.pl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .625rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-soft);
+    color: var(--pl-text);
+    font-family: inherit;
+    font-size: .95rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+    transition: background var(--pl-fast) ease,
+                color var(--pl-fast) ease,
+                border-color var(--pl-fast) ease,
+                box-shadow var(--pl-fast) ease;
+}
+
+.pl-btn:hover {
+    background: #e9ebf1;
+    color: var(--pl-text);
+}
+
+.pl-btn-primary {
+    background: var(--pl-accent);
+    color: var(--pl-white);
+}
+
+.pl-btn-primary:hover {
+    background: var(--pl-accent-dark);
+    color: var(--pl-white);
+}
+
+.pl-btn-outline {
+    border-color: var(--pl-line);
+    background: var(--pl-white);
+}
+
+.pl-btn-outline:hover {
+    border-color: var(--pl-accent);
+    background: var(--pl-white);
+    color: var(--pl-accent);
+}
+
+.pl-btn-ghost {
+    background: transparent;
+    color: var(--pl-accent);
+}
+
+.pl-btn-ghost:hover {
+    background: var(--pl-accent-soft);
+    color: var(--pl-accent-dark);
+}
+
+.pl-btn-sm {
+    padding: .4rem .8rem;
+    font-size: .85rem;
+}
+
+/*  Кнопки-посилання
+ *  ----------------
+ *  Правило `.plusest a` вище задає колір усім посиланням розділу, і за
+ *  правилами CSS воно перебиває клас кнопки: у селектора з класом і тегом
+ *  (`.plusest a`) специфічність вища, ніж в одного класу (`.pl-btn`). Тому
+ *  білий текст на синій кнопці став би синім і зник.
+ *
+ *  Щоб цього не сталося, кольори кнопок повторені тут із префіксом
+ *  `.plusest` — так у них два класи, і вони виграють. Це стосується лише
+ *  тих класів, які трапляються на тегу <a>.
+ *
+ *  Якщо додаєте власний вигляд кнопки — не забудьте про це саме правило.
+ */
+.plusest a.pl-btn,
+.plusest a.pl-card-details,
+.plusest a.pl-back,
+.plusest a.pl-fav-link,
+.plusest a.pl-page {
+    color: var(--pl-text);
+}
+
+.plusest a.pl-btn-primary,
+.plusest a.pl-btn-primary:hover,
+.plusest a.pl-page.is-active,
+.plusest .pl-card:hover a.pl-card-details,
+.plusest a.pl-card-details:hover {
+    color: var(--pl-white);
+}
+
+.plusest a.pl-btn-ghost,
+.plusest a.pl-btn-ghost:hover,
+.plusest a.pl-btn-outline:hover,
+.plusest a.pl-back:hover,
+.plusest a.pl-page:hover,
+.plusest a.pl-agent-phone {
+    color: var(--pl-accent);
+}
+
+.plusest a.pl-fav-link:hover {
+    color: var(--pl-like);
+}
+
+.plusest a.pl-page.is-disabled {
+    color: #c3c7d2;
+}
+
+/* Посилання «назад до списку»: стрілка зсувається при наведенні — маленький
+   натяк, що це саме повернення, а не перехід уперед. */
+.pl-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    color: var(--pl-text);
+    font-size: .95rem;
+}
+
+.pl-back .fi {
+    transition: transform var(--pl-fast) ease;
+}
+
+.pl-back:hover {
+    color: var(--pl-accent);
+}
+
+.pl-back:hover .fi {
+    transform: translateX(-3px);
+}
+
+
+/* ===========================================================================
+ *  5. Навігація розділу, перемикачі
+ * =========================================================================== */
+
+.pl-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.pl-nav-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+}
+
+/* --- Перемикачі мови та валюти ------------------------------------------- */
+
+.pl-switch {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-white);
+}
+
+.pl-switch a {
+    padding: .35rem .7rem;
+    color: var(--pl-muted);
+    font-size: .85rem;
+    font-weight: 500;
+    line-height: 1.4;
+    transition: background var(--pl-fast) ease, color var(--pl-fast) ease;
+}
+
+.pl-switch a + a {
+    border-left: 1px solid var(--pl-line);
+}
+
+.pl-switch a:hover {
+    background: var(--pl-accent-soft);
+    color: var(--pl-accent);
+}
+
+.pl-switch a.is-active {
+    background: var(--pl-accent);
+    color: var(--pl-white);
+}
+
+/* --- Посилання на обране з лічильником ----------------------------------- */
+
+.pl-fav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .35rem .7rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-white);
+    color: var(--pl-text);
+    font-size: .85rem;
+    font-weight: 500;
+    transition: border-color var(--pl-fast) ease, color var(--pl-fast) ease;
+}
+
+.pl-fav-link:hover {
+    border-color: var(--pl-like);
+    color: var(--pl-like);
+}
+
+.pl-fav-link .pl-heart {
+    width: 15px;
+    height: 15px;
+}
+
+/* Лічильник обраного. Поки список порожній, скрипт ставить сюди атрибут
+   hidden — щоб не показувати «0». */
+.pl-fav-count {
+    min-width: 1.25rem;
+    padding: 0 .3rem;
+    border-radius: 999px;
+    background: var(--pl-like);
+    color: var(--pl-white);
+    font-size: .75rem;
+    line-height: 1.25rem;
+    text-align: center;
+}
+
+
+/* ===========================================================================
+ *  6. Фільтр
+ * ===========================================================================
+ *
+ *  Фільтр складається з двох частин:
+ *
+ *    .pl-filter-main  — операція, тип і ціна. Завжди на видноті, на білому
+ *                       полі по центру екрана;
+ *    .pl-filter-extra — решта параметрів. Виїжджає знизу при натисканні
+ *                       «Більше параметрів», позиціонується абсолютно —
+ *                       тому не розсовує сторінку, — і закривається кліком
+ *                       поза блоком.
+ *
+ *  Уся конструкція лежить в обгортці .pl-filter-wrap з рухомим градієнтом.
+ */
+
+.pl-filter-wrap {
+    position: relative;
+    margin-bottom: 2.5rem;
+    padding: 2.5rem 0;
+
+    /* Градієнт удвічі ширший за екран і повільно рухається — фон «дихає»,
+       але нічого не відволікає. Заміните --pl-accent — зміниться й він. */
+    background: linear-gradient(115deg,
+        var(--pl-accent-dark) 0%,
+        var(--pl-accent) 35%,
+        #4f63d0 60%,
+        var(--pl-accent-dark) 100%);
+    background-size: 300% 300%;
+    animation: pl-gradient 18s ease infinite;
+}
+
+@keyframes pl-gradient {
+    0% {
+        background-position: 0 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+/* Відвідувачам, які просили в системі прибрати анімації, рухомий фон не
+   показуємо: для декоративної анімації це обовʼязкова ввічливість. */
+@media (prefers-reduced-motion: reduce) {
+    .pl-filter-wrap {
+        animation: none;
+    }
+}
+
+.pl-filter {
+    position: relative;
+    padding: 1.25rem;
+    border-radius: var(--pl-radius);
+    background: var(--pl-white);
+    box-shadow: var(--pl-shadow-lg);
+}
+
+/* --- Видима частина ------------------------------------------------------ */
+
+.pl-filter-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.pl-filter-buttons {
+    display: flex;
+    gap: .5rem;
+}
+
+/* --- Поле фільтра -------------------------------------------------------- */
+
+.pl-field {
+    min-width: 0;
+}
+
+.pl-field-label {
+    display: block;
+    margin-bottom: .35rem;
+    color: var(--pl-muted);
+    font-size: .8rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+}
+
+.pl-input,
+.pl-select {
+    width: 100%;
+    padding: .55rem .75rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-white);
+    color: var(--pl-text);
+    font-family: inherit;
+    font-size: .95rem;
+    line-height: 1.4;
+    transition: border-color var(--pl-fast) ease, box-shadow var(--pl-fast) ease;
+}
+
+.pl-input:focus,
+.pl-select:focus {
+    border-color: var(--pl-accent);
+    box-shadow: 0 0 0 3px var(--pl-accent-soft);
+    outline: none;
+}
+
+/* Пара полів «від — до» в одному рядку. */
+.pl-range {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.pl-range .pl-input {
+    min-width: 0;
+}
+
+.pl-range-dash {
+    color: var(--pl-muted);
+}
+
+/* --- Блок «Більше параметрів» -------------------------------------------- */
+
+.pl-filter-extra {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+    z-index: 40;
+    padding: 1.25rem;
+    border-radius: var(--pl-radius);
+    background: var(--pl-white);
+    box-shadow: var(--pl-shadow-lg);
+
+    /* Закритий стан. Показ вимкнено через visibility, а не display: інакше
+       не було б чого анімувати. */
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity var(--pl-fast) ease,
+                transform var(--pl-fast) ease,
+                visibility var(--pl-fast) ease;
+}
+
+.pl-filter-extra.is-open {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pl-filter-extra-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+}
+
+.pl-filter-extra-grid-break {
+    grid-column: 1 / -1;
+}
+
+.pl-filter-extra-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--pl-line);
+}
+
+/* Поле, приховане логікою залежностей (кімнати для ділянки тощо). Ставить
+   і знімає цей клас site.js. */
+.pl-field.is-hidden {
+    display: none;
+}
+
+/* Стрілка на кнопці «Більше параметрів» перевертається, коли блок відкритий. */
+.pl-more-arrow {
+    transition: transform var(--pl-fast) ease;
+}
+
+[data-pl-more][aria-expanded="true"] .pl-more-arrow {
+    transform: rotate(180deg);
+}
+
+.pl-field-hint {
+    margin-top: .3rem;
+    color: var(--pl-muted);
+    font-size: .78rem;
+}
+
+
+/* ===========================================================================
+ *  7. Картка обʼєкта
+ * ===========================================================================
+ *
+ *  Картка — головний елемент розділу, тому опишемо її докладно:
+ *
+ *    .pl-card-media    фотографії в каруселі, 4:3. Висота не змінюється при
+ *                      прокручуванні: кожен слайд — блок з фіксованою
+ *                      пропорцією, а фотографія в ньому обрізається по
+ *                      центру (object-fit: cover);
+ *    .pl-card-flag     позначки NEW і «Продано» поверх фотографії;
+ *    .pl-card-price    ціна на градієнті в нижній частині фотографії;
+ *    .pl-card-body     назва, адреса, житловий комплекс;
+ *    .pl-card-facts    три параметри на світло-сірому тлі;
+ *    .pl-card-actions  кнопки, притиснуті до низу картки.
+ *
+ *  Однакова висота карточок у рядку тримається на flex: сама картка —
+ *  колонка, у якій .pl-card-body розтягується, а кнопки залишаються знизу.
+ */
+
+.pl-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius);
+    background: var(--pl-white);
+    transition: box-shadow var(--pl-slow) ease, transform var(--pl-slow) ease;
+}
+
+.pl-card:hover {
+    box-shadow: var(--pl-shadow-lg);
+    transform: translateY(-3px);
+}
+
+/* --- Фотографії ---------------------------------------------------------- */
+
+.pl-card-media {
+    position: relative;
+    overflow: hidden;
+    background: var(--pl-soft);
+}
+
+/* Пропорція 4:3 задана відступом, а не aspect-ratio: так однакова висота
+   слайдів працює і в старих браузерах, і до того, як карусель порахувала
+   свої розміри. */
+.pl-card-photo {
+    position: relative;
+    display: block;
+    padding-top: 75%;
+    background: var(--pl-soft);
+}
+
+.pl-card-photo img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: filter var(--pl-slow) ease;
+}
+
+.pl-card-media.pl-sold:not(:hover) .pl-card-photo img {
+    filter: grayscale(1);
+}
+
+/* Обʼєкт без фотографій. Пропорцію тримаємо ту саму, 4:3, — інакше така
+   картка була б нижчою за сусідні й рядок «стрибав» би. */
+.pl-card-empty {
+    position: relative;
+    padding-top: 75%;
+    background: var(--pl-soft);
+}
+
+.pl-card-empty span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--pl-muted);
+    font-size: .875rem;
+}
+
+/* --- Ціна на градієнті --------------------------------------------------- */
+
+/* Градієнт займає нижні 30% фотографії: знизу чорний із прозорістю 55%,
+   догори — прозорий. При наведенні на картку плавно синіє. */
+.pl-card-price {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 30%;
+    padding: .75rem 1rem;
+    background: linear-gradient(to top,
+        rgba(0, 0, 0, .55) 0%,
+        rgba(0, 0, 0, .32) 45%,
+        rgba(0, 0, 0, 0) 100%);
+    color: var(--pl-white);
+
+    /* Кліки проходять крізь градієнт до фотографії — інакше нижня третина
+       картки не відкривала б галерею. */
+    pointer-events: none;
+    transition: background var(--pl-slow) ease;
+}
+
+.pl-card:hover .pl-card-price {
+    background: linear-gradient(to top,
+        rgba(47, 67, 169, .78) 0%,
+        rgba(47, 67, 169, .45) 45%,
+        rgba(47, 67, 169, 0) 100%);
+}
+
+.pl-card-price .pl-price {
+    font-size: 1.4rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+}
+
+.pl-card-price-note {
+    font-family: var(--pl-font-price);
+    font-size: .82rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+}
+
+/* --- Позначки ------------------------------------------------------------ */
+
+/* NEW — косою лентою в лівому верхньому куті. Стрічка ширша за кут, тому
+       вилазить за межі картки, а .pl-card-media її обрізає. */
+.pl-card-new {
+    position: absolute;
+    top: 22px;
+    left: -34px;
+    z-index: 4;
+    width: 140px;
+    padding: .3rem 0;
+    background: var(--pl-accent);
+    color: var(--pl-white);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-align: center;
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+
+/* «Продано» / «Здано» — у правому верхньому куті на чорному тлі. */
+.pl-card-sold {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 4;
+    padding: .3rem .7rem;
+    border-radius: var(--pl-radius-sm);
+    background: rgba(0, 0, 0, .8);
+    color: var(--pl-white);
+    font-size: .8rem;
+    font-weight: 500;
+}
+
+/* --- Назва й адреса ------------------------------------------------------ */
+
+/* Розтягуємо цей блок: якщо в одній картці назва в один рядок, а в
+   сусідній — у два, зайвий простір мусить піти сюди, а не відірвати
+   кнопки від низу. */
+.pl-card-body {
+    flex: 1 1 auto;
+    padding: 1rem 1rem .85rem;
+}
+
+.pl-card-title {
+    margin: 0 0 .5rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.pl-card-title a {
+    color: var(--pl-text);
+}
+
+.pl-card-title a:hover {
+    color: var(--pl-accent);
+}
+
+.pl-card-line {
+    display: flex;
+    align-items: flex-start;
+    gap: .45rem;
+    margin-top: .3rem;
+    color: var(--pl-muted);
+    font-size: .875rem;
+    line-height: 1.4;
+}
+
+.pl-card-line .fi {
+    flex: 0 0 auto;
+    margin-top: 1px;
+    color: var(--pl-muted);
+    font-size: .95rem;
+}
+
+/* --- Три параметри ------------------------------------------------------- */
+
+.pl-card-facts {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: .35rem 1rem;
+    padding: .7rem 1rem;
+    border-top: 1px solid var(--pl-line);
+    background: var(--pl-soft);
+    font-size: .875rem;
+}
+
+.pl-card-fact {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    color: var(--pl-text);
+    white-space: nowrap;
+}
+
+.pl-card-fact .fi {
+    color: var(--pl-muted);
+    font-size: 1.05rem;
+}
+
+/* --- Кнопки картки ------------------------------------------------------- */
+
+.pl-card-actions {
+    display: flex;
+    margin-top: auto;
+    border-top: 1px solid var(--pl-line);
+}
+
+/* Кнопка «Детальніше» займає всю ширину, крім місця під сердечко. Синій фон
+   зʼявляється при наведенні на всю картку — так само, як синіє градієнт на
+   фотографії. */
+.pl-card-details {
+    flex: 1 1 auto;
+    padding: .8rem 1rem;
+    border: 0;
+    border-radius: 0;
+    background: var(--pl-white);
+    color: var(--pl-text);
+    font-size: .95rem;
+    font-weight: 500;
+    text-align: center;
+    transition: background var(--pl-slow) ease, color var(--pl-slow) ease;
+}
+
+.pl-card:hover .pl-card-details {
+    background: var(--pl-accent);
+    color: var(--pl-white);
+}
+
+.pl-card-details:hover {
+    background: var(--pl-accent-dark);
+    color: var(--pl-white);
+}
+
+/* --- Сердечко «в обране» ------------------------------------------------- */
+
+/* Сердечко — вбудований SVG, а не символ шрифту іконок: тут потрібні два
+   стани (контур і залитий), і перемикати їх заливкою простіше й надійніше,
+   ніж підміняти глиф. */
+.pl-fav-btn {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--pl-line);
+    background: var(--pl-white);
+    color: var(--pl-muted);
+    cursor: pointer;
+    transition: background var(--pl-fast) ease, color var(--pl-fast) ease;
+}
+
+.pl-fav-btn:hover {
+    background: var(--pl-white);
+    color: var(--pl-like);
+}
+
+.pl-heart {
+    display: block;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    transition: fill var(--pl-fast) ease,
+                stroke var(--pl-fast) ease,
+                transform var(--pl-fast) ease;
+}
+
+/* Відкладений обʼєкт: сердечко залите. */
+.pl-fav-btn.is-active {
+    color: var(--pl-like);
+}
+
+.pl-fav-btn.is-active .pl-heart {
+    fill: var(--pl-like);
+    stroke: var(--pl-like);
+}
+
+.pl-fav-btn:active .pl-heart {
+    transform: scale(.85);
+}
+
+
+/* ===========================================================================
+ *  8. Список обʼєктів, сортування, пагінація
+ * =========================================================================== */
+
+/* Сітка карточок: три в рядок на великих екранах, дві на середніх, одна на
+   малих (див. розділ «Адаптив»). Однакову висоту дає сам grid — рядок
+   вирівнюється за найвищою карткою, а .pl-card має height: 100%. */
+.pl-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.pl-list-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.pl-list-total {
+    color: var(--pl-muted);
+    font-size: .95rem;
+}
+
+/* --- Сортування ---------------------------------------------------------- */
+
+/* Це не поле форми, а власний випадний список із посилань: сортування —
+   така сама частина адреси, як і фільтри, і кожен варіант має власне ЧПУ. */
+.pl-sort {
+    position: relative;
+}
+
+.pl-sort-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 30;
+    min-width: 220px;
+    padding: .35rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-white);
+    box-shadow: var(--pl-shadow);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity var(--pl-fast) ease,
+                transform var(--pl-fast) ease,
+                visibility var(--pl-fast) ease;
+}
+
+.pl-sort-menu.is-open {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pl-sort-menu a {
+    display: block;
+    padding: .45rem .6rem;
+    border-radius: var(--pl-radius-sm);
+    color: var(--pl-text);
+    font-size: .9rem;
+    transition: background var(--pl-fast) ease, color var(--pl-fast) ease;
+}
+
+.pl-sort-menu a:hover {
+    background: var(--pl-soft);
+}
+
+.pl-sort-menu a.is-active {
+    background: var(--pl-accent-soft);
+    color: var(--pl-accent);
+    font-weight: 500;
+}
+
+/* --- Пагінація ----------------------------------------------------------- */
+
+.pl-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    justify-content: center;
+    margin-top: 2.5rem;
+}
+
+.pl-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 .6rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-white);
+    color: var(--pl-text);
+    font-size: .9rem;
+    transition: background var(--pl-fast) ease,
+                border-color var(--pl-fast) ease,
+                color var(--pl-fast) ease;
+}
+
+.pl-page:hover {
+    border-color: var(--pl-accent);
+    color: var(--pl-accent);
+}
+
+.pl-page.is-active {
+    border-color: var(--pl-accent);
+    background: var(--pl-accent);
+    color: var(--pl-white);
+}
+
+.pl-page.is-disabled {
+    color: #c3c7d2;
+    pointer-events: none;
+}
+
+.pl-page-gap {
+    display: inline-flex;
+    align-items: center;
+    min-width: 24px;
+    justify-content: center;
+    color: var(--pl-muted);
+}
+
+
+/* ===========================================================================
+ *  9. Сторінка публікації
+ * =========================================================================== */
+
+/* --- Шапка з розмитою фотографією ---------------------------------------- */
+
+/*  Заголовок стоїть не в контейнері, а в обгортці на всю ширину: тлом у неї
+ *  йде перша фотографія обʼєкта (розмір large) із розмиттям. Сама
+ *  фотографія — окремий шар .pl-hero-bg, бо filter: blur() застосований до
+ *  обгортки розмив би й текст.
+ */
+.pl-hero {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    background: var(--pl-accent-dark);
+}
+
+.pl-hero-bg {
+    position: absolute;
+    top: -40%;
+    right: -5%;
+    bottom: -50%;
+    left: -5%;
+
+    /* Розмиття зʼїдає краї, тому шар навмисно більший за обгортку. */
+    background-position: center;
+    background-size: cover;
+    filter: blur(18px) saturate(1.1);
+    transform: scale(1.06);
+
+    /* Паралакс: цей шар зсуває site.js при прокручуванні. Підказка
+       браузеру, що зміниться саме transform, прибирає сіпання. */
+    will-change: transform;
+}
+
+/* Затемнення поверх фотографії: без нього білий заголовок читається лише
+   на темних фото. */
+.pl-hero-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+        rgba(20, 24, 40, .35) 0%,
+        rgba(20, 24, 40, .6) 100%);
+}
+
+.pl-hero-inner {
+    position: relative;
+    padding: 7rem 0;
+}
+
+.pl-hero h1 {
+    margin: 0;
+    color: var(--pl-white);
+    font-size: 3rem;
+    font-weight: 400;
+    letter-spacing: .02em;
+    text-align: center;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, .4);
+    text-transform: uppercase;
+}
+
+.pl-hero h1 span {
+    display: block;
+    font-size: 1.8rem;
+    margin-top: 1rem;
+}
+
+/* Обʼєкт без фотографій: замість розмитого тла — рівний колір. */
+.pl-hero-plain .pl-hero-veil {
+    background: none;
+}
+
+/* --- Повідомлення про реалізований обʼєкт -------------------------------- */
+
+.pl-sold-notice {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--pl-radius);
+    background: #232733;
+    color: var(--pl-white);
+}
+
+.pl-sold-notice .fi {
+    font-size: 1.4rem;
+}
+
+.pl-sold-notice-title {
+    font-weight: 600;
+}
+
+/* --- Дві колонки: фотографії та дані ------------------------------------- */
+
+.pl-object {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+/* Колонка фотографій вужча за решту й не тягнеться: ~300px, як і задумано.
+   Решту місця забирає блок даних. */
+.pl-object-photos {
+    flex: 0 0 300px;
+    max-width: 300px;
+}
+
+.pl-object-data {
+    flex: 1 1 420px;
+    min-width: 0;
+}
+
+/* --- Галерея ------------------------------------------------------------- */
+
+.pl-gallery-main {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding-top: 75%;
+    border-radius: var(--pl-radius);
+    background: var(--pl-soft);
+}
+
+.pl-gallery-main img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--pl-slow) ease;
+}
+
+.pl-gallery-main:hover img {
+    transform: scale(1.04);
+}
+
+/* Значок «дивитись усі фотографії» поверх головного фото. */
+.pl-gallery-badge {
+    position: absolute;
+    right: .6rem;
+    bottom: .6rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .6rem;
+    border-radius: var(--pl-radius-sm);
+    background: rgba(0, 0, 0, .6);
+    color: var(--pl-white);
+    font-size: .78rem;
+}
+
+/* Стрічка мініатюр: маленькі превьюшки 45×35 — рівно того розміру, у якому
+   вони лежать на диску. Їхня задача — показати, скільки фотографій має
+   обʼєкт, і дати почати перегляд із потрібної. */
+.pl-gallery-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.pl-gallery-strip a {
+    display: block;
+    overflow: hidden;
+    border-radius: 3px;
+    line-height: 0;
+    opacity: .85;
+    transition: opacity var(--pl-fast) ease, transform var(--pl-fast) ease;
+}
+
+.pl-gallery-strip a:hover {
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+.pl-gallery-strip img {
+    display: block;
+    width: 45px;
+    height: 35px;
+    object-fit: cover;
+}
+
+/* --- Мультимедіа під фотографіями ---------------------------------------- */
+
+.pl-multimedia {
+    margin-top: 1rem;
+}
+
+.pl-multimedia a {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem .7rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    font-size: .875rem;
+    transition: border-color var(--pl-fast) ease, background var(--pl-fast) ease;
+}
+
+.pl-multimedia a + a {
+    margin-top: .4rem;
+}
+
+.pl-multimedia a:hover {
+    border-color: var(--pl-accent);
+    background: var(--pl-accent-soft);
+}
+
+/* --- Верхній блок даних: адреса та параметри ліворуч, ціна праворуч ------------------- */
+
+.pl-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: space-between;
+}
+
+.pl-summary-place {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.pl-summary-price {
+    flex: 0 0 auto;
+    text-align: right;
+}
+
+.pl-summary-place .pl-card-line {
+    margin-top: .45rem;
+    color: var(--pl-text);
+    font-size: .95rem;
+}
+
+.pl-summary-price .pl-price {
+    display: block;
+    font-size: 2rem;
+    line-height: 1.15;
+}
+
+.pl-summary-unit {
+    display: block;
+    margin-top: .2rem;
+    color: var(--pl-muted);
+    font-family: var(--pl-font-price);
+    font-size: .95rem;
+}
+
+/* Позначки «торг» і «можлива розтермінування» — маленькі плашки під ціною. */
+.pl-price-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    justify-content: flex-end;
+    margin-top: .6rem;
+}
+
+.pl-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .25rem .55rem;
+    border-radius: 999px;
+    background: var(--pl-accent-soft);
+    color: var(--pl-accent);
+    font-size: .78rem;
+    font-weight: 500;
+}
+
+/* --- Основні параметри --------------------------------------------------- */
+
+.pl-params {
+    display: grid;
+    gap: .1rem 1.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pl-param {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .2rem 0;
+    border-bottom: 1px dashed var(--pl-line);
+}
+
+.pl-param-name {
+    color: var(--pl-muted);
+    font-size: .9rem;
+}
+
+.pl-param-value {
+    font-weight: 500;
+    text-align: right;
+}
+
+/* --- Характеристики у розкладці masonry ---------------------------------- */
+
+/*  Розділів характеристик буває від двох до десяти, і вони дуже різної
+ *  висоти — «Комунікації» на два рядки поруч із «Комфортом» на п'ятнадцять.
+ *  Звичайна сітка залишила б під коротким розділом порожнє місце, тому
+ *  розкладку рахує Masonry: ширину стовпця задаємо тут, а вертикальну
+ *  укладку робить бібліотека.
+ */
+.pl-masonry {
+    margin: 0 -.5rem;
+}
+
+.pl-masonry-item {
+    width: 33.333%;
+    padding: 0 .5rem 1rem;
+}
+
+.pl-masonry-box {
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius);
+    background: var(--pl-white);
+    transition: border-color var(--pl-fast) ease, box-shadow var(--pl-fast) ease;
+}
+
+.pl-masonry-box:hover {
+    border-color: #d6dae6;
+    box-shadow: var(--pl-shadow);
+}
+
+.pl-masonry-title {
+    margin: 0 0 .6rem;
+    font-size: .95rem;
+    font-weight: 600;
+}
+
+.pl-chars {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: .875rem;
+}
+
+.pl-chars li + li {
+    margin-top: .35rem;
+}
+
+.pl-chars-name {
+    color: var(--pl-muted);
+}
+
+/* --- Опис ---------------------------------------------------------------- */
+
+.pl-description {
+    font-size: 1rem;
+    line-height: 1.65;
+}
+
+/* --- Кнопка «в обране» на сторінці --------------------------------------- */
+
+.pl-fav-wide {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .625rem 1.1rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-white);
+    color: var(--pl-text);
+    font-family: inherit;
+    font-size: .95rem;
+    cursor: pointer;
+    transition: border-color var(--pl-fast) ease, color var(--pl-fast) ease;
+}
+
+.pl-fav-wide:hover {
+    border-color: var(--pl-like);
+    color: var(--pl-like);
+}
+
+.pl-fav-wide.is-active {
+    border-color: var(--pl-like);
+    color: var(--pl-like);
+}
+
+.pl-fav-wide.is-active .pl-heart {
+    fill: var(--pl-like);
+    stroke: var(--pl-like);
+}
+
+
+/* ===========================================================================
+ *  10. Картка агента
+ * =========================================================================== */
+
+.pl-agent {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.75rem;
+    align-items: center;
+    overflow: hidden;
+    padding: 1.75rem;
+    border-radius: var(--pl-radius);
+
+    /* Той самий градієнт, що й під фільтром, — блок агента і блок пошуку
+       перегукуються, і сторінка виглядає цілісною. */
+    background: linear-gradient(115deg,
+        var(--pl-accent-dark) 0%,
+        var(--pl-accent) 45%,
+        #4f63d0 100%);
+    color: var(--pl-white);
+}
+
+.pl-agent-photo {
+    flex: 0 0 auto;
+    width: 104px;
+    height: 104px;
+    border: 3px solid rgba(255, 255, 255, .35);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.pl-agent-info {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.pl-agent-role {
+    margin-bottom: .2rem;
+    color: rgba(255, 255, 255, .7);
+    font-size: .8rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.pl-agent-name {
+    margin: 0 0 .5rem;
+    color: var(--pl-white);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.pl-agent-lead {
+    margin: 0 0 .25rem;
+    color: rgba(255, 255, 255, .92);
+    font-size: .95rem;
+    line-height: 1.55;
+}
+
+.pl-agent-note {
+    color: rgba(255, 255, 255, .65);
+    font-size: .85rem;
+}
+
+.pl-agent-contacts {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+/* Телефон — головна кнопка всього блоку: саме дзвінок і є цільова дія. */
+.pl-agent-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .6rem 1.1rem;
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-white);
+    color: var(--pl-accent);
+    font-family: var(--pl-font-price);
+    font-size: 1.05rem;
+    white-space: nowrap;
+    transition: background var(--pl-fast) ease, transform var(--pl-fast) ease;
+}
+
+.pl-agent-phone:hover {
+    background: #f2f4ff;
+    color: var(--pl-accent-dark);
+    transform: translateY(-1px);
+}
+
+.pl-agent-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    justify-content: center;
+}
+
+.pl-agent-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .25rem .6rem;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 999px;
+    color: var(--pl-white);
+    font-size: .78rem;
+    transition: background var(--pl-fast) ease, border-color var(--pl-fast) ease;
+}
+
+.pl-agent-links a:hover {
+    border-color: var(--pl-white);
+    background: rgba(255, 255, 255, .15);
+    color: var(--pl-white);
+}
+
+
+/* ===========================================================================
+ *  11. Обране
+ * =========================================================================== */
+
+.pl-fav-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Поки скрипт не отримав відповідь сервера, показуємо цей рядок. */
+.pl-fav-loading {
+    padding: 2rem 0;
+    color: var(--pl-muted);
+    text-align: center;
+}
+
+
+/* ===========================================================================
+ *  12. Повідомлення й порожні стани
+ * =========================================================================== */
+
+.pl-note {
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius);
+    background: var(--pl-white);
+}
+
+.pl-note-title {
+    margin-bottom: .35rem;
+    font-weight: 600;
+}
+
+.pl-empty {
+    padding: 3rem 1.5rem;
+    border: 1px dashed var(--pl-line);
+    border-radius: var(--pl-radius);
+    text-align: center;
+}
+
+.pl-empty-icon {
+    margin-bottom: .75rem;
+    color: #c3c7d2;
+    font-size: 2.5rem;
+}
+
+.pl-error {
+    border-color: #f2c6cf;
+    background: #fdf3f5;
+}
+
+
+/* ===========================================================================
+ *  13. Перевизначення бібліотек
+ * ===========================================================================
+ *
+ *  Select2, Owl Carousel і Fancybox приходять зі своїм оформленням, і воно
+ *  помітно відрізняється від решти розділу. Тут ми приводимо їх до спільного
+ *  вигляду. Якщо якусь бібліотеку ви прибрали з layout.php — відповідний
+ *  блок можна видалити.
+ */
+
+/* --- Select2 ------------------------------------------------------------- */
+
+.plusest .select2-container {
+    width: 100% !important;
+}
+
+.plusest .select2-container--default .select2-selection--single,
+.plusest .select2-container--default .select2-selection--multiple {
+    min-height: 40px;
+    padding: 2px 4px;
+    border: 1px solid var(--pl-line);
+    border-radius: var(--pl-radius-sm);
+    transition: border-color var(--pl-fast) ease, box-shadow var(--pl-fast) ease;
+}
+
+.plusest .select2-container--default.select2-container--focus .select2-selection--multiple,
+.plusest .select2-container--default.select2-container--open .select2-selection--single {
+    border-color: var(--pl-accent);
+    box-shadow: 0 0 0 3px var(--pl-accent-soft);
+}
+
+.plusest .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-left: 8px;
+    color: var(--pl-text);
+    font-size: .95rem;
+    line-height: 34px;
+}
+
+.plusest .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px;
+}
+
+/* Вибрані пункти у множинному списку — плашки кольору розділу. */
+.plusest .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    margin-top: 5px;
+    padding: 1px 8px;
+    border: 0;
+    border-radius: var(--pl-radius-sm);
+    background: var(--pl-accent-soft);
+    color: var(--pl-accent);
+    font-size: .85rem;
+}
+
+.plusest .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    margin: 0 -2px;
+    border: 0;
+    background: none;
+    color: var(--pl-accent);
+    font-size: 1rem;
+    position: relative;
+}
+
+/* Випадне меню Select2 живе в кінці body, а не всередині .plusest, тому
+   селектори тут без цього префікса — інакше стилі до нього не дійдуть. */
+.select2-dropdown {
+    border-color: var(--pl-line, #e7e9f0);
+    border-radius: 6px;
+    box-shadow: 0 12px 40px rgba(35, 39, 51, .16);
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected],
+.select2-container--default .select2-results__option--highlighted[data-selected] {
+    background: var(--pl-accent, #2f43a9);
+}
+
+.select2-container--default .select2-results__option[aria-selected="true"] {
+    background: #eef0fb;
+    color: #2f43a9;
+}
+
+.select2-search--dropdown .select2-search__field {
+    border-color: #e7e9f0;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+.select2-search .select2-search__field {
+    margin: 0.55rem 0 0 .75rem !important;
+    font-size: .95rem !important;
+}
+
+/* --- Owl Carousel -------------------------------------------------------- */
+
+/*  Власний CSS каруселі ховає її цілком (display: none), поки не запустився
+ *  JavaScript, — і фотографія в картці блимала б порожнім полем. Тому до
+ *  ініціалізації показуємо перший слайд самі: без JavaScript картка теж
+ *  залишиться з фотографією, просто без прокручування.
+ */
+.pl-card-carousel:not(.owl-loaded) {
+    display: block;
+}
+
+.pl-card-carousel:not(.owl-loaded) .pl-card-slide:not(:first-child) {
+    display: none;
+}
+
+.pl-card-media .owl-nav {
+    margin: 0;
+}
+
+/* Стрілки: зʼявляються лише при наведенні на картку — на дотикових екранах
+   вони не потрібні, там працює свайп. */
+.pl-card-media .owl-nav button.owl-prev,
+.pl-card-media .owl-nav button.owl-next {
+    position: absolute;
+    top: 50%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: -18px 0 0;
+    border-radius: 50%;
+    background: rgba(47, 67, 169, .85);
+    color: var(--pl-white);
+    font-size: 1rem;
+    opacity: 0;
+    transition: opacity var(--pl-fast) ease, background var(--pl-fast) ease;
+}
+
+.pl-card-media .owl-nav button.owl-prev {
+    left: 10px;
+}
+
+.pl-card-media .owl-nav button.owl-next {
+    right: 10px;
+}
+
+.pl-card:hover .owl-nav button.owl-prev,
+.pl-card:hover .owl-nav button.owl-next,
+.pl-card-media .owl-nav button:focus-visible {
+    opacity: 1;
+}
+
+.pl-card-media .owl-nav button.owl-prev:hover,
+.pl-card-media .owl-nav button.owl-next:hover {
+    background: var(--pl-accent);
+}
+
+.pl-card-media .owl-nav button.disabled {
+    opacity: 0 !important;
+}
+
+/* Точки-індикатори внизу фотографії. Ставимо їх над градієнтом ціни, у
+   правому куті, щоб не перекривати саму ціну. */
+.pl-card-media .owl-dots {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    z-index: 5;
+    display: flex;
+    gap: 4px;
+}
+
+.pl-card-media .owl-dots button.owl-dot span {
+    width: 6px;
+    height: 6px;
+    margin: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .55);
+    transition: background var(--pl-fast) ease;
+}
+
+.pl-card-media .owl-dots button.owl-dot.active span {
+    background: var(--pl-white);
+}
+
+/* --- Fancybox ------------------------------------------------------------ */
+
+/* Галерея відкривається поверх усього, і всередині вона своя. Правимо лише
+   колір активних елементів, щоб він збігався з розділом. */
+.fancybox__container {
+    --fancybox-accent-color: #2f43a9;
+    --fancybox-bg: rgba(20, 24, 40, .94);
+}
+
+/* --- Мапа ---------------------------------------------------------------- */
+
+.pl-map {
+    border-radius: var(--pl-radius);
+    margin: 2.5rem 0;
+    height: 300px;
+    width: 100%;
+}
+
+/* ===========================================================================
+ *  14. Адаптив
+ * ===========================================================================
+ *
+ *  Три межі:
+ *
+ *    < 1080px — дві картки в рядок, фільтр у два ряди;
+ *    <  760px — одна картка в рядок, сторінка публікації одним стовпцем;
+ *    <  520px — найдрібніші правки для телефонів.
+ */
+
+@media (max-width: 1080px) {
+    .pl-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pl-filter-main {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pl-filter-buttons {
+        grid-column: 1 / -1;
+    }
+
+    .pl-filter-buttons .pl-btn {
+        flex: 1 1 auto;
+    }
+
+    .pl-masonry-item {
+        width: 50%;
+    }
+}
+
+@media (max-width: 760px) {
+    .pl-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pl-hero h1 {
+        font-size: 1.5rem;
+    }
+
+    .pl-hero h1 span {
+        font-size: 1rem;
+    }
+
+    .pl-hero-inner {
+        padding: 5rem 0;
+    }
+
+    /* Паралакс на телефонах вимикаємо: там прокручування й без нього не
+       завжди плавне, а фонове зображення на весь екран дороге. */
+    .pl-hero-bg {
+        transform: none !important;
+    }
+
+    /* Сторінка публікації одним стовпцем: фотографії, потім дані. */
+    .pl-object {
+        display: block;
+    }
+
+    .pl-object-photos {
+        max-width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .pl-gallery-main {
+        padding-top: 66%;
+    }
+
+    /* Ціна переїжджає під адресу параметри. */
+    .pl-summary-price {
+        text-align: center;
+        flex: 1 0 auto;
+    }
+
+    .pl-price-tags {
+        justify-content: center;
+    }
+
+    .pl-masonry-item {
+        width: 100%;
+    }
+
+    .pl-agent {
+        gap: 1.25rem;
+        padding: 1.25rem;
+        text-align: center;
+    }
+
+    .pl-agent-photo {
+        margin: 0 auto;
+    }
+
+    .pl-agent-contacts {
+        flex: 1 1 100%;
+        align-items: center;
+    }
+}
+
+@media (max-width: 520px) {
+    .pl-container {
+        padding: 0 14px;
+    }
+
+    .pl-filter {
+        padding: 1rem;
+    }
+
+    .pl-filter-main {
+        grid-template-columns: 1fr;
+    }
+
+    .pl-filter-wrap {
+        padding: 1.5rem 0;
+    }
+
+    /* Блок додаткових параметрів на телефоні розтягуємо на всю ширину
+       обгортки: 210px у стовпці там уже не влазять. */
+    .pl-filter-extra {
+        padding: 1rem;
+    }
+
+    .pl-filter-extra-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pl-card-price .pl-price {
+        font-size: 1.2rem;
+    }
+
+    .pl-summary-price .pl-price {
+        font-size: 1.6rem;
+    }
+
+    .pl-nav {
+        gap: .6rem;
+    }
+}

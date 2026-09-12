@@ -1,0 +1,44 @@
+{
+    "name": "plusest/site",
+    "description": "Заготовка сайту-бази нерухомості: синхронізація обʼєктів з CRM Plusest та рендеринг на власному сайті",
+    "type": "library",
+    "keywords": [
+        "plusest",
+        "realty",
+        "real-estate",
+        "crm",
+        "feed"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=7.3",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "intervention/image": "^2.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Plusest\\Site\\": "src/"
+        },
+        "files": [
+            "src/Support/polyfill.php"
+        ]
+    },
+    "bin": [
+        "bin/plusestSite"
+    ],
+    "archive": {
+        "exclude": [
+            "/build",
+            "/.idea",
+            "/temp.txt"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

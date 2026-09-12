@@ -1,0 +1,21 @@
+# Захист каталогу шаблонів на випадок, якщо він виявиться доступним з вебу
+# (наприклад, коли сайт працює на Apache і каталог опинився під document root).
+#
+# Шаблони — це PHP-файли, які очікують передані змінні, тому напряму їх
+# відкривати не можна й не потрібно: усі сторінки розділу віддає
+# public/index.php.
+#
+# У nginx директиви .htaccess не працюють — там каталог templates просто не
+# повинен входити в location, що віддає файли. Приклад конфігурації nginx
+# наведений у docs/nginx.md.
+
+# Apache 2.4
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

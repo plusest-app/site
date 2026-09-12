@@ -1,0 +1,10 @@
+/vendor/
+composer.lock
+.idea/
+.claude/
+temp.txt
+*.tmp
+
+# Результати збірки релізного архіву
+/build/stage/
+/build/*.zip
