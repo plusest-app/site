@@ -293,7 +293,7 @@ class Config
         $feedUrl = (string) $this->get('feed.url');
 
         if ($feedUrl === '') {
-            $problems[] = 'Не заповнено "feed.url" — скопіюйте посилання публікації з CRM.';
+            $problems[] = 'Не заповнено "feed.url" — скопіюйте посилання на JSON-feed з Plusest.';
         } elseif (!preg_match('~^https?://~i', $feedUrl)) {
             $problems[] = '"feed.url" має починатися з http:// або https://';
         } elseif (str_contains($feedUrl, 'XXXXXXXX')) {

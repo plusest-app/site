@@ -161,7 +161,7 @@ class InstallCommand
         $this->cli->title('Що робити далі');
         $this->cli->line('1. Відкрийте ' . $config);
         $this->cli->line('   і заповніть секції db (доступ до MySQL) та feed.url');
-        $this->cli->line('   (посилання публікації з кабінету CRM).');
+        $this->cli->line('   (посилання на JSON-feed з кабінету CRM).');
         $this->cli->line('');
         $this->cli->line('2. Створіть таблиці в базі:');
         $this->cli->line('   php vendor/bin/plusestSite migrate --config=' . $config);

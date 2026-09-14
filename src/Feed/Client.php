@@ -9,7 +9,7 @@ use Plusest\Site\Exception\FeedRefusedException;
 /**
  * Отримує фід обʼєктів з CRM.
  *
- * Робить один запит за посиланням публікації, повторює його при збоях мережі
+ * Робить один запит за посиланням на JSON-feed, повторює його при збоях мережі
  * і повертає розібраний фід у вигляді обʼєкта Feed.
  *
  * Використання:
@@ -32,7 +32,7 @@ class Client
     const USER_AGENT = 'PlusestSite/1.0';
 
     /**
-     * Посилання публікації з CRM.
+     * Посилання на JSON-feed з CRM.
      *
      * @var string
      */
@@ -74,7 +74,7 @@ class Client
     private $logger;
 
     /**
-     * @param string $url     Посилання публікації
+     * @param string $url     Посилання на JSON-feed
      * @param array  $options Ключі timeout, retries, retryDelay, verifySsl
      */
     public function __construct($url, array $options = [])
@@ -161,7 +161,7 @@ class Client
         if (!preg_match('~^https?://~i', $url)) {
             throw new FeedException(
                 'Некоректне посилання на фід: "' . $url . '".' . "\n"
-                . 'Воно має починатися з https:// — скопіюйте посилання публікації з кабінету CRM.'
+                . 'Воно має починатися з https:// — скопіюйте посилання на JSON-feed з кабінету Plusest.'
             );
         }
 
@@ -268,10 +268,7 @@ class Client
             return [
                 'ok'        => false,
                 'body'      => '',
-                'error'     => 'CRM відповіла кодом HTTP ' . $httpCode . '.'
-                    . ($httpCode === 404 ? ' Перевірте посилання публікації у налаштуваннях.' : '')
-                    . ($httpCode === 403 ? ' Можливо, публікацію вимкнено в кабінеті CRM.' : '')
-                    . ($httpCode === 429 ? ' Забагато запитів — зменшіть частоту синхронізації.' : ''),
+                'error'     => 'CRM відповіла кодом HTTP ' . $httpCode . '.',
                 'retryable' => $retryable,
                 'refused'   => $refused,
                 'time'      => $time,
