@@ -6,6 +6,7 @@ use Plusest\Site\Config;
 use Plusest\Site\Exception\ConfigException;
 use Plusest\Site\Model\ModelStore;
 use Plusest\Site\Support\Fs;
+use Plusest\Site\Sync\Ban;
 use Plusest\Site\Sync\Schedule;
 use Plusest\Site\Sync\StateStore;
 use Plusest\Site\Sync\Synchronizer;
@@ -101,6 +102,21 @@ class SyncCommand
         $state = new StateStore($db);
 
         $this->cli->title('Стан синхронізації');
+
+        // Про остаточне блокування кажемо першим рядком: без цього дані нижче
+        // виглядають просто застарілими, і незрозуміло, чому вони не
+        // оновлюються.
+        $ban = Ban::fromConfig($config);
+
+        if ($ban->exists()) {
+            $reason = $ban->reason();
+
+            $this->cli->warn('Синхронізацію вимкнено: CRM закрила доступ агентству назавжди'
+                . ($reason === null ? '' : ' (' . $reason . ')') . '.');
+            $this->cli->line('Файл блокування: ' . $ban->file());
+            $this->cli->line('Видаліть його, якщо доступ до CRM відновили.');
+            $this->cli->line('');
+        }
 
         $lastSync = $state->get(StateStore::LAST_SYNC_AT);
 

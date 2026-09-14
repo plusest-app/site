@@ -77,18 +77,29 @@ class Feed
             $message = Arr::str($decoded, 'message');
             $reason = Arr::str($decoded, 'data.reason');
 
-			if ($reason === 'Banned forever') {
+            // Окремий випадок: агентство заблоковане назавжди. Радити тут
+            // «перевірте налаштування» безглуздо — перевіряти нема чого.
+            if (FeedRefusedException::isPermanentReason($reason)) {
+                throw new FeedRefusedException(
+                    'CRM закрила доступ агентству назавжди'
+                    . ($message === null ? '' : ': ' . $message) . ' (' . $reason . ')' . "\n"
+                    . 'Синхронізацію буде вимкнено, і запити до CRM більше не надсилатимуться. '
+                    . 'Щоб розібратися з блокуванням, зверніться до підтримки Plusest.',
+                    $reason
+                );
+            }
 
-				file_put_contents(__DIR__ . '/../../disallowed.lock', 'Banned forever');
-
-			}
-
+            // Саму позначку про блокування ставить не цей клас: він розбирає
+            // відповідь і нічого не знає ні про налаштування, ні про службовий
+            // каталог. Причину передаємо у виключення, а вимикає синхронізацію
+            // Synchronizer — там і конфіг є, і лог.
             throw new FeedRefusedException(
                 'CRM відмовила у видачі даних: ' . ($message === null ? 'без пояснення' : $message)
                 . ($reason === null ? '' : ' (' . $reason . ')') . "\n"
                 . 'Найчастіші причини — невірне чи вимкнене посилання публікації, '
                 . 'не оплачений доступ до CRM або забагато запитів. Перевірте кабінет '
-                . 'CRM і налаштування feed.url.'
+                . 'CRM і налаштування feed.url.',
+                $reason
             );
         }
 
