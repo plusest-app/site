@@ -356,7 +356,8 @@ class WebInstaller
             $this->row([
                 $this->text('feedUrl', 'Посилання на JSON-feed', $values,
                     'Виглядає так: https://plusest.app/api/json-feed/site/?id=...', 12, true),
-            ])
+            ]),
+            true
         );
 
         // --- Адреси ---------------------------------------------------------
@@ -961,17 +962,18 @@ class WebInstaller
     /**
      * Розділ форми із заголовком і поясненням.
      *
-     * @param string $title Заголовок
-     * @param string $hint  Пояснення
-     * @param string $body  Поля
+     * @param string $title    Заголовок
+     * @param string $hint     Пояснення
+     * @param string $body     Поля
+     * @param bool   $hintHtml Чи містить пояснення готову HTML-розмітку
      *
      * @return string HTML
      */
-    private function section($title, $hint, $body)
+    private function section($title, $hint, $body, $hintHtml = false)
     {
         return '<section class="card mb-4"><div class="card-body">'
             . '<h2 class="h5">' . $this->esc($title) . '</h2>'
-            . '<p class="text-muted small">' . $this->esc($hint) . '</p>'
+            . '<p class="text-muted small">' . ($hintHtml ? $hint : $this->esc($hint)) . '</p>'
             . $body
             . '</div></section>';
     }
