@@ -523,7 +523,7 @@
 
         function apply() {
             var type = typeInput.value;
-            var newBuilding = newBuildingInput.value;
+            var newBuilding = newBuildingInput ? newBuildingInput.value : '';
 
             fields.forEach(function (field) {
                 var types = (field.getAttribute('data-pl-types') || '').split(/\s+/);
@@ -548,7 +548,9 @@
         }
 
         typeInput.addEventListener('change', apply);
-        newBuildingInput.addEventListener('change', apply);
+        if (newBuildingInput) {
+            newBuildingInput.addEventListener('change', apply);
+        }
         apply();
     }
 
