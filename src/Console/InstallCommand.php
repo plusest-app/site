@@ -162,6 +162,8 @@ class InstallCommand
         $this->cli->line('1. Відкрийте ' . $config);
         $this->cli->line('   і заповніть секції db (доступ до MySQL) та feed.url');
         $this->cli->line('   (посилання на JSON-feed з кабінету CRM).');
+        $this->cli->line('   Там же перевірте timezone — у цьому поясі рахується');
+        $this->cli->line('   розклад звернень до CRM (за замовчуванням Europe/Kyiv).');
         $this->cli->line('');
         $this->cli->line('2. Створіть таблиці в базі:');
         $this->cli->line('   php vendor/bin/plusestSite migrate --config=' . $config);

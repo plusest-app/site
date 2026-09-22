@@ -63,6 +63,9 @@ class WebInstaller
      * @var array
      */
     private static $fields = [
+        // --- Часовий пояс ---------------------------------------------------
+        'timezone' => 'string',
+
         // --- База даних -----------------------------------------------------
         'dbHost'     => 'string',
         'dbPort'     => 'int',
@@ -437,9 +440,11 @@ class WebInstaller
         // --- Синхронізація --------------------------------------------------
         $body .= $this->section(
             'Синхронізація',
-            'Що робити з публікацією, яка зникла з CRM, і чи обмежувати завантаження '
-            . 'фотографій за один прогін.',
+            'Часовий пояс агентства, що робити з публікацією, яка зникла з CRM, і чи обмежувати '
+            . 'завантаження фотографій за один прогін.',
             $this->row([
+                $this->text('timezone', 'Часовий пояс', $values,
+                    'У ньому рахується розклад звернень до CRM і пишеться час у базу', 3, true),
                 $this->select('syncMissingMode', 'Публікація зникла з CRM', $values, [
                     'sold'   => 'позначити реалізованою (рекомендовано)',
                     'hidden' => 'прибрати з пошуку, лишити за посиланням',
@@ -626,6 +631,14 @@ class WebInstaller
             $problems[] = 'Посилання на JSON-feed має починатися з https://';
         }
 
+        // Пояс перевіряємо тією ж логікою, що діє в роботі: назву з нової
+        // бази tzdata Config підміняє рівнозначною, тому відкидати її тут
+        // через незнання цим PHP було б неправильно.
+        if ($values['timezone'] !== '' && (new Config(['timezone' => $values['timezone']]))->timezone() === null) {
+            $problems[] = 'Невідомий часовий пояс "' . $values['timezone']
+                . '". Приклади: Europe/Kyiv, Europe/Warsaw, UTC.';
+        }
+
         if ($values['langAvailable'] === []) {
             $problems[] = 'Виберіть хоча б одну мову.';
         }
@@ -727,6 +740,13 @@ class WebInstaller
                 : $current['cronToken'];
         }
 
+        // У config.php порожній пояс означає «не чіпати те, що в php.ini», але
+        // у формі це радше промах, ніж свідомий вибір, — там поле обовʼязкове.
+        // Свідомо відмовитись від налаштування можна, стерши значення у файлі.
+        if ($values['timezone'] === '') {
+            $values['timezone'] = Config::DEFAULT_TIMEZONE;
+        }
+
         // Адреса фотографій за замовчуванням — це адреса розділу + photos/.
         if ($values['urlsPhotos'] === '' && $values['urlsBase'] !== '') {
             $values['urlsPhotos'] = rtrim($values['urlsBase'], '/') . '/photos/';
@@ -766,6 +786,8 @@ class WebInstaller
         // значення показуємо у формі, щоб повторне налаштування не
         // доводилось починати з нуля.
         $map = [
+            'timezone' => 'timezone',
+
             'dbHost'     => 'db.host',
             'dbPort'     => 'db.port',
             'dbName'     => 'db.name',

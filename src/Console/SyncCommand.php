@@ -118,6 +118,11 @@ class SyncCommand
             $this->cli->line('');
         }
 
+        // Час і пояс — першими після можливого блокування: усі значення нижче
+        // записані в цьому ж поясі, і саме з ними їх порівнюють із логами CRM.
+        // Розбіжність тут — найчастіша причина питання «чому розклад поїхав».
+        $this->cli->line('Час сервера:     ' . date('Y-m-d H:i:s') . ' (' . date_default_timezone_get() . ')');
+
         $lastSync = $state->get(StateStore::LAST_SYNC_AT);
 
         if ($lastSync === null) {

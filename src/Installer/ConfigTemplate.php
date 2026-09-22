@@ -54,6 +54,11 @@ class ConfigTemplate
     public static function defaults()
     {
         return [
+            // --- Часовий пояс -----------------------------------------------
+            //  Назва з tzdata 2022b; PHP зі старішою базою не знає такої, і
+            //  Config підставить рівнозначну Europe/Kiev.
+            'timezone' => 'Europe/Kyiv',
+
             // --- База даних -------------------------------------------------
             'dbHost'     => '127.0.0.1',
             'dbPort'     => 3306,

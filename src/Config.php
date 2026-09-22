@@ -22,6 +22,30 @@ use Plusest\Site\Support\Fs;
 class Config
 {
     /**
+     * Часовий пояс, який діє, якщо в конфізі його не задали.
+     *
+     * Саме назва пояса, а не «як налаштовано на сервері»: поки пояс брався з
+     * php.ini, розклад звернень до CRM рахував денні години в невідомо якому
+     * поясі (див. Sync\Schedule).
+     */
+    const DEFAULT_TIMEZONE = 'Europe/Kyiv';
+
+    /**
+     * Рівнозначні назви поясів — на випадок старої чи нової бази tzdata.
+     *
+     * Київ перейменували з Kiev на Kyiv лише у tzdata 2022b, а на хостингах
+     * трапляється і PHP зі старішою базою, і найсвіжіший. Тому назву, якої
+     * цей PHP не знає, підміняємо рівнозначною, замість того щоб відмовлятись
+     * від налаштування.
+     *
+     * @var array
+     */
+    private static $timezoneAliases = [
+        'Europe/Kyiv' => 'Europe/Kiev',
+        'Europe/Kiev' => 'Europe/Kyiv',
+    ];
+
+    /**
      * Повний масив налаштувань.
      *
      * @var array
@@ -81,7 +105,16 @@ class Config
             throw new ConfigException('Файл налаштувань має повертати масив: ' . $path);
         }
 
-        return new self($items, $path);
+        $config = new self($items, $path);
+
+        // Пояс застосовуємо одразу після завантаження, а не в точках входу:
+        // від нього залежать і розклад синхронізації, і час, який пишеться в
+        // базу та в лог, і дати на сторінках сайту. Точок входу чотири (cron,
+        // веб-запуск cron.php, сторінка сайту, команди CLI), і всі вони
+        // приходять сюди.
+        $config->applyTimezone();
+
+        return $config;
     }
 
     /**
@@ -191,6 +224,87 @@ class Config
     }
 
     /**
+     * Часовий пояс, у якому працює сайт.
+     *
+     * @return string|null Назва пояса; null — якщо в конфізі пояс порожній
+     *                     або цей PHP такої назви не знає
+     */
+    public function timezone()
+    {
+        $timezone = trim((string) $this->get('timezone', self::DEFAULT_TIMEZONE));
+
+        // Порожнє значення — свідома відмова від налаштування: залишаємо те,
+        // що стоїть у php.ini. Комусь із власним оточенням так і потрібно.
+        if ($timezone === '') {
+            return null;
+        }
+
+        if (self::isKnownTimezone($timezone)) {
+            return $timezone;
+        }
+
+        if (isset(self::$timezoneAliases[$timezone])
+            && self::isKnownTimezone(self::$timezoneAliases[$timezone])
+        ) {
+            return self::$timezoneAliases[$timezone];
+        }
+
+        return null;
+    }
+
+    /**
+     * Встановлює часовий пояс із налаштувань.
+     *
+     * Навіщо це потрібно
+     * ------------------
+     * Без цього date() працює в поясі з php.ini, а він у CLI (де працює cron)
+     * і у вебсервері буває різний і майже ніколи не той, у якому живе
+     * агентство. Розклад звернень до CRM рахує «денні години» саме через
+     * date(), тому розбіжність у три години зсувала все вікно: ранковий
+     * запит потрапляв у нічний інтервал, і наступний був лише за пів дня.
+     * Тим самим поясом позначається час у базі, у логу й на сторінках.
+     *
+     * Якщо пояс у конфізі порожній або невідомий цьому PHP — не змінюємо
+     * нічого; про невідому назву скаже validate().
+     *
+     * @return string|null Назва застосованого пояса або null
+     */
+    public function applyTimezone()
+    {
+        $timezone = $this->timezone();
+
+        if ($timezone === null) {
+            return null;
+        }
+
+        date_default_timezone_set($timezone);
+
+        return $timezone;
+    }
+
+    /**
+     * Чи знає цей PHP такий часовий пояс.
+     *
+     * Перевіряємо через DateTimeZone, а не через timezone_identifiers_list():
+     * у списку немає старих назв-посилань (наприклад Europe/Kiev на новій
+     * базі tzdata), хоча працюють вони як і раніше.
+     *
+     * @param string $timezone Назва пояса
+     *
+     * @return bool
+     */
+    private static function isKnownTimezone($timezone)
+    {
+        try {
+            new \DateTimeZone($timezone);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Перелік увімкнених мов у порядку, заданому користувачем.
      *
      * Мова за замовчуванням завжди стоїть першою, навіть якщо в конфізі вона
@@ -281,6 +395,16 @@ class Config
     public function validate()
     {
         $problems = [];
+
+        // --- Часовий пояс ---------------------------------------------------
+        //  Помилку в назві важливо показати саме тут: далі пояс просто тихо
+        //  залишиться тим, що в php.ini, і розклад поїде на кілька годин.
+        $timezone = trim((string) $this->get('timezone', self::DEFAULT_TIMEZONE));
+
+        if ($timezone !== '' && $this->timezone() === null) {
+            $problems[] = 'Невідомий часовий пояс "' . $timezone . '" у "timezone" — вкажіть назву'
+                . ' зі списку PHP, наприклад Europe/Kyiv (список: php.net/manual/en/timezones.php).';
+        }
 
         // --- База даних -----------------------------------------------------
         foreach (['db.name', 'db.user'] as $key) {
